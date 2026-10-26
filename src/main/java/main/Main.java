@@ -63,22 +63,26 @@ public class Main {
 	}
 
 	/**
-	 * Decide que menú mostrar en función de tipo de empleado que haya iniciado
-	 * sesión.
+	 * Decide qué menú mostrar en función del perfil que haya iniciado sesión.
 	 * 
-	 * @param tipoEmpleado tipo de empleado que inicia sesión.
+	 * @param perfil perfil del usuario autenticado.
 	 */
-	public static void mostrar(String tipoEmpleado) {
-		switch (tipoEmpleado) {
-		case "secretariado":
+	public static void mostrar(Perfiles perfil) {
+		if (perfil == null) {
+			invitado();
+			return;
+		}
+		switch (perfil) {
+		case SECRETARIA:
 			secretariado();
 			break;
-		case "enfermeria":
+		case ENFERMERIA:
 			enfermeria();
 			break;
-		case "administrador":
+		case ADMINISTRADOR:
 			administrador();
 			break;
+		case CIRUJANO:
 		default:
 			invitado();
 			break;
@@ -86,18 +90,24 @@ public class Main {
 	}
 
 	/**
-	 * Maneja que acciones realizar para cada tipo de empleado.
+	 * Maneja qué acciones realizar para cada perfil.
 	 * 
-	 * @return {@code false} si la opción no existe para ese tipo de empleado.
+	 * @param perfil perfil del usuario autenticado.
+	 * @param opcion int introducido por el usuario.
+	 * @return {@code false} si la opción no existe para ese perfil.
 	 */
-	private static boolean ejecutarAccion(String tipoEmpleado, int opcion) {
-		switch (tipoEmpleado) {
-		case "secretariado":
+	private static boolean ejecutarAccion(Perfiles perfil, int opcion) {
+		if (perfil == null) {
+			return false;
+		}
+		switch (perfil) {
+		case SECRETARIA:
 			return accionesSecretariado(opcion);
-		case "enfermeria":
+		case ENFERMERIA:
 			return accionesEnfermeria(opcion);
-		case "administrador":
+		case ADMINISTRADOR:
 			return accionesAdministrador(opcion);
+		case CIRUJANO:
 		default:
 			return false;
 		}
@@ -112,13 +122,13 @@ public class Main {
 	private static boolean accionesSecretariado(int opcion) {
 		switch (opcion) {
 		case 2:
-			System.out.println("Futura implementación para eliminar un empleado.");
+			GestorEmpleados.eliminarEmpleado();
 			return true;
 		case 3:
-			System.out.println("Futura implementación para añadir un empleado.");
+			GestorEmpleados.anadirEmpleado();
 			return true;
 		case 4:
-			System.out.println("Futura implementación para modificar un empleado.");
+			GestorEmpleados.modificarEmpleado();
 			return true;
 		default:
 			return false;
@@ -159,12 +169,12 @@ public class Main {
 	 * @param opcion int introducido por el usuario.
 	 * @return boolean validar si salir o no.
 	 */
-	  private static boolean accionesAdministrador(int opcion) {
-		  	if (opcion >= 5 && opcion <= 8) {
-		  		return accionesEnfermeria(opcion - 3);
-		  	}
-		  	return accionesSecretariado(opcion);
-	  }
+	private static boolean accionesAdministrador(int opcion) {
+		if (opcion >= 5 && opcion <= 8) {
+			return accionesEnfermeria(opcion - 3);
+		}
+		return accionesSecretariado(opcion);
+	}
 
 	/**
 	 * Un ciclo del menú de invitado.
@@ -196,7 +206,7 @@ public class Main {
 		sesion = Sesion.login();
 		if (sesion != null) {
 			System.out.println(
-					"Bienvenido/a " + sesion.getTipoEmpleado() + " " + sesion.getNombre() + ", tenga un buen día.");
+					"Bienvenido/a " + sesion.getPerfil().getNombre() + " " + sesion.getNombre() + ", tenga un buen día.");
 		}
 	}
 
@@ -206,8 +216,8 @@ public class Main {
 	 * @return {@code true} si el usuario quiere salir del programa.
 	 */
 	private static boolean turnoAutenticado() {
-		String tipoEmpleado = sesion.getTipoEmpleado();
-		mostrar(tipoEmpleado);
+		Perfiles perfil = sesion.getPerfil();
+		mostrar(perfil);
 		int opcion = Utilidades.leerInt(SC);
 		if (opcion == 0) {
 			System.out.println("Has salido correctamente del menú de trabajo.");
@@ -215,7 +225,7 @@ public class Main {
 		}
 		if (opcion == 1) {
 			cerrarSesion();
-		} else if (!ejecutarAccion(tipoEmpleado, opcion)) {
+		} else if (!ejecutarAccion(perfil, opcion)) {
 			System.err.println("ERROR: Has introducido incorrectamente los datos. Seleccione una opción del menú.");
 		}
 		return false;

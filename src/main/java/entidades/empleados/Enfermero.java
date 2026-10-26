@@ -27,4 +27,10 @@ public class Enfermero extends Empleado {
 				+ ", apellidos=" + apellidos + ", telefono=" + telefono + ", email=" + email + ", dnifNie=" + dnifNie
 				+ ", direccion=" + direccion + "]";
 	}
+
+	@Override
+	public void mostrar() {
+		super.mostrar();
+		System.out.println("Categoría: " + (categoria != null ? categoria.name() : "Sin asignar"));
+	}
 }

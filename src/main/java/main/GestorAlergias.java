@@ -23,9 +23,8 @@ import entidades.Medicamento;
  * @author Diego Rodríguez Fernández
  */
 public class GestorAlergias {
-	private static final File CARPETA = new File("src/main/resources/alergias");
+	private static final File CARPETA = new File(Configuracion.getRutaAlergias());
 	private static final Pattern PATRON_FICHERO = Pattern.compile("alergia_(\\d+)\\.dat");
-	private static File[] ficheros = CARPETA.listFiles((dir, nombre) -> nombre.endsWith(".dat"));
 
 	/**
 	 * Identifica un fichero de alergia mediante su id.

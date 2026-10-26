@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
-import java.util.Scanner;
 
 /**
  * Representa una sesión dentro del programa.
@@ -20,35 +18,23 @@ import java.util.Scanner;
  */
 public class Sesion {
 
-	// Rutas y archivos de autenticación
-	private static final String RUTA_RECURSOS = "src/main/resources";
-	private static final File CREDENCIALES_FILE = new File(RUTA_RECURSOS, "credenciales.txt");
-	private static final File PROPERTIES_FILE = new File(RUTA_RECURSOS, "application.properties");
-
-	// Datos administrador
-	private static final String ADMIN_USUARIO = "admin-name";
-	private static final String ADMIN_PASSWORD = "admin-password";
 	private static final String NOMBRE_ADMINISTRADOR = "Administrador";
-	
-	public static final String TIPO_SECRETARIADO = "secretariado";
-	public static final String TIPO_ENFERMERIA = "enfermeria";
-	public static final String TIPO_ADMIN = "administrador";
 
 	private static Sesion sesion;
 
 	private String nombreUsuario;
 	private String nombre;
-	private String tipoEmpleado;
+	private Perfiles perfil;
 
 	public Sesion() {
 
 	}
 
-	public Sesion(String nombreUsuario, String nombre, String tipoEmpleado) {
+	public Sesion(String nombreUsuario, String nombre, Perfiles perfil) {
 		super();
 		this.nombreUsuario = nombreUsuario;
 		this.nombre = nombre;
-		this.tipoEmpleado = tipoEmpleado;
+		this.perfil = perfil;
 	}
 
 	public String getNombreUsuario() {
@@ -67,19 +53,17 @@ public class Sesion {
 		this.nombre = nombre;
 	}
 
-	public String getTipoEmpleado() {
-		return tipoEmpleado;
+	public Perfiles getPerfil() {
+		return perfil;
 	}
 
-	public void setTipoEmpleado(String tipoEmpleado) {
-		this.tipoEmpleado = tipoEmpleado;
+	public void setPerfil(Perfiles perfil) {
+		this.perfil = perfil;
 	}
 
 	@Override
 	public String toString() {
-		return "Sesion [nombreUsuario=" + nombreUsuario + ", nombre=" + nombre + ", tipoEmpleado=" + tipoEmpleado
-				+ ", getNombreUsuario()=" + getNombreUsuario() + ", getNombre()=" + getNombre() + ", getTipoEmpleado()="
-				+ getTipoEmpleado() + "]";
+		return "Sesion [nombreUsuario=" + nombreUsuario + ", nombre=" + nombre + ", perfil=" + perfil + "]";
 	}
 
 	/**
@@ -107,14 +91,11 @@ public class Sesion {
 			return null;
 		}
 		Sesion candidata;
-		Properties adminProperties = cargarPropiedadesAdmin();
-		if (adminProperties != null && usuario.equals(adminProperties.getProperty(ADMIN_USUARIO))) {
-			candidata = autenticarAdmin(usuario, contrasenia, adminProperties);
+		String adminNombre = Configuracion.getAdminNombre();
+		if (adminNombre != null && usuario.equals(adminNombre)) {
+			candidata = autenticarAdmin(usuario, contrasenia);
 		} else {
 			candidata = autenticarEmpleado(usuario, contrasenia);
-			if (candidata != null && !normalizarPerfilEmpleado(candidata)) {
-				return null;
-			}
 		}
 		sesion = candidata;
 		return sesion;
@@ -131,36 +112,18 @@ public class Sesion {
 	}
 	
 	/**
-	 * Carga application.properties.
-	 * 
-	 * @return las propiedades del administrador, o {@code null} si no se pudo leer el fichero.
-	 */
-	private static Properties cargarPropiedadesAdmin() {
-		Properties props = new Properties();
-		try (FileReader fr = new FileReader(PROPERTIES_FILE)) {
-			props.load(fr);;
-			return props;
-		} catch (FileNotFoundException e) {
-			System.err.println("ERROR: No se ha encontrado el archivo application.properties");
-		} catch (IOException e) {
-			System.err.println("ERROR: No se ha podido leer el archivo application.properties.");
-		}
-		return null;
-	}
-	
-	/**
-	 * Auntentica las credenciales del administrador.
-	 * 
-	 * @param usuario String registra el nombre de usuario introducido por el usuario.
-	 * @param contrasenia String registra la contraseña introducida por el usuario.
-	 * @param adminProperties objeto {@link Properties} que contiene las propiedades de configuración utilizadas para validar las credenciales del administrador.
-	 * @return la sesion iniciada, o {@code null} si no se ha podido iniciar.
-	 * 
+	 * Autentica las credenciales del administrador comparando con los valores
+	 * obtenidos de {@link Configuracion}.
+	 *
+	 * @param usuario     nombre de usuario introducido.
+	 * @param contrasenia contraseña introducida.
+	 * @return la sesión iniciada, o {@code null} si la contraseña es incorrecta.
+	 *
 	 * @see #login()
 	 */
-	private static Sesion autenticarAdmin(String usuario, String contrasenia, Properties adminProperties) {
-		if (contrasenia.equals(adminProperties.getProperty(ADMIN_PASSWORD))) {
-			return new Sesion(usuario, NOMBRE_ADMINISTRADOR, TIPO_ADMIN);
+	private static Sesion autenticarAdmin(String usuario, String contrasenia) {
+		if (contrasenia.equals(Configuracion.getAdminPassword())) {
+			return new Sesion(usuario, NOMBRE_ADMINISTRADOR, Perfiles.ADMINISTRADOR);
 		}
 		System.err.println("ERROR: La contraseña es incorrecta, inténtelo de nuevo.");
 		return null;
@@ -179,7 +142,7 @@ public class Sesion {
 		boolean usuarioExiste = false;
 		boolean contraseniaExiste = false;
  
-		try (BufferedReader br = new BufferedReader(new FileReader(CREDENCIALES_FILE))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(new File(Configuracion.getRutaCredenciales())))) {
 			String linea;
 			while ((linea = br.readLine()) != null) {
 				String[] palabras = linea.split("\\|");
@@ -190,7 +153,13 @@ public class Sesion {
 				boolean contraseniaCoincide = contrasenia.equals(palabras[1]);
  
 				if (usuarioCoincide && contraseniaCoincide) {
-					return new Sesion(usuario, palabras[2], palabras[3]);
+					Perfiles perfil = resolverPerfilEmpleado(palabras[3]);
+					if (perfil == null) {
+						System.err.println("ERROR: El usuario tiene un perfil no válido (\"" + palabras[3]
+								+ "\") en credenciales.txt. Contacte con el administrador.");
+						return null;
+					}
+					return new Sesion(usuario, palabras[2], perfil);
 				}
 				usuarioExiste = usuarioCoincide;
 				contraseniaExiste = contraseniaCoincide;
@@ -223,22 +192,26 @@ public class Sesion {
 	}
 	
 	/**
-	 * Normaliza (sin espacios ni mayúsculas) y valida el perfil de un empleado leído
-	 * de credenciales.txt. Solo se admiten secretariado y enfermería: el perfil
-	 * admin existe únicamente en application.properties.
+	 * Resuelve y valida el perfil de un empleado leído de credenciales.txt asignándole
+	 * su constante correspondiente del enum {@link Perfiles}.
 	 *
-	 * @param candidata sesión recién autenticada, cuyo perfil se normaliza.
-	 * @return {@code true} si el perfil es válido.
+	 * @param textoPerfil cadena leída de credenciales.txt
+	 * @return el enum {@link Perfiles} correspondiente, o {@code null} si no es válido.
 	 */
-	private static boolean normalizarPerfilEmpleado(Sesion candidata) {
-		String perfil = (candidata.getTipoEmpleado() == null) ? "" : candidata.getTipoEmpleado().trim().toLowerCase();
-
-		if (perfil.equals(TIPO_SECRETARIADO) || perfil.equals(TIPO_ENFERMERIA)) {
-			candidata.setTipoEmpleado(perfil);
-			return true;
+	private static Perfiles resolverPerfilEmpleado(String textoPerfil) {
+		if (textoPerfil == null) {
+			return null;
 		}
-		System.err.println("ERROR: El usuario tiene un perfil no válido (\"" + candidata.getTipoEmpleado()
-				+ "\") en credenciales.txt. Contacte con el administrador.");
-		return false;
+		String normalizado = textoPerfil.trim().toLowerCase();
+		if (normalizado.equals(Perfiles.SECRETARIA.getNombre()) || normalizado.equals("secretariado")) {
+			return Perfiles.SECRETARIA;
+		}
+		if (normalizado.equals(Perfiles.ENFERMERIA.getNombre())) {
+			return Perfiles.ENFERMERIA;
+		}
+		if (normalizado.equals(Perfiles.CIRUJANO.getNombre())) {
+			return Perfiles.CIRUJANO;
+		}
+		return null;
 	}
 }

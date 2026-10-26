@@ -90,5 +90,14 @@ public class Empleado {
 		return "Empleado [idEmpleado=" + idEmpleado + ", nombre=" + nombre + ", apellidos=" + apellidos + ", telefono="
 				+ telefono + ", email=" + email + ", dnifNie=" + dnifNie + ", direccion=" + direccion + "]";
 	}
-	
+
+	public void mostrar() {
+		System.out.println("ID empleado: " + idEmpleado);
+		System.out.println("Nombre: " + nombre);
+		System.out.println("Apellidos: " + apellidos);
+		System.out.println("Teléfono: " + telefono);
+		System.out.println("Email: " + email);
+		System.out.println("DNI/NIE: " + dnifNie);
+		System.out.println("Dirección: " + direccion);
+	}
 }

@@ -16,7 +16,7 @@
       - [CU3.1 Ver alergias (CU3A)](#cu31-ver-alergias-cu3a)
       - [CU3.2 Nueva alergia (CU3B)](#cu32-nueva-alergia-cu3b)
       - [CU3.3 Editar alergia (CU3C)](#cu33-editar-alergia-cu3c)
-   5. [CU4: Todos los CU de un usuario](#cu4-todos-los-cu-de-un-usuario)
+   5. [Nota: Permisos del Administrador](#nota-permisos-del-administrador)
 3. [Resumen de casos de uso](#resumen-de-casos-de-uso)
 
 ---
@@ -163,7 +163,7 @@ usecase-beta
 
 ## Administrar empleados
 
-Pueden realizarlo **Secretariado** y **Administrador**. En el diagrama, Secretariado se conecta directamente a los CU y Administrador accede a través de CU4.
+Pueden realizarlo **Secretariado** y **Administrador**. En el diagrama, Secretariado se conecta directamente a los CU y Administrador accede a ellos mediante sus permisos globales (reflejados en la Nota de Administrador).
 
 ### CU2.1 Crear nuevo empleado
 
@@ -261,13 +261,19 @@ Pueden realizarlo **Enfermería** y **Administrador**. Cada alergia se almacena 
 
 ---
 
-## CU4: Todos los CU de un usuario
+## Nota: Permisos del Administrador
+ 
+> **Nota del Diagrama:** *Administrador engloba todos los CU de todos los usuarios.*
 
-- **Actor:** Administrador
-- **Descripción:** Representa que el Administrador puede ejecutar **todos los casos de uso de gestión** de los demás perfiles, es decir, administrar empleados (CU2.1 a CU2.3) y administrar alergias (CU3.1 a CU3.3). Por herencia de Usuario, también puede cerrar sesión (CU1.2).
-- **Precondición:** sesión iniciada con las credenciales fijas del Administrador (`admin`/`admin`, cargadas de `application.properties`).
-- **Flujo principal:** el sistema le ofrece el menú completo y el actor elige cualquiera de los CU anteriores, que se ejecuta con el flujo descrito en cada uno.
-- **Nota:** en el diagrama esto sustituye a las conexiones individuales que están comentadas (`%%Administrador --> ...`), de modo que se reduce la cantidad de flechas.
+- **Descripción y alcance:** 
+  A nivel de modelado UML y diagrama de casos de uso, esta nota sustituye las múltiples asociaciones individuales del actor **Administrador** hacia cada uno de los casos de uso del sistema (`CU2.1`, `CU2.2`, `CU2.3`, `CU3.1`, `CU3.2`, `CU3.3`). De esta manera se evita la sobrecarga visual de flechas cruzadas en el diagrama mientras se modela fielmente el comportamiento de la aplicación.
+- **Capacidades del Administrador:**
+  El Administrador es un superusuario con permisos transversales que puede ejecutar la totalidad de operaciones existentes:
+  1. **Administración de empleados:** Gestionar íntegramente la plantilla clínica (alta de nuevos empleados en `CU2.1`, modificación de datos en `CU2.2` y eliminación de personal en `CU2.3`).
+  2. **Administración de alergias:** Consultar el catálogo de alergias registradas (`CU3.1`), dar de alta nuevas afecciones y medicamentos (`CU3.2`) y editar registros existentes (`CU3.3`).
+  3. **Control de sesión:** Al heredar del actor genérico **Usuario**, puede cerrar sesión (`CU1.2`) de forma estándar.
+- **Autenticación e inicio:**
+  El acceso de este perfil se valida mediante credenciales maestras fijas (`admin-name` y `admin-password`) configuradas externamente en `application.properties`. Al iniciar sesión, la interfaz le proporciona de manera unificada el menú completo con acceso directo a todas las funcionalidades del sistema.
 
 ---
 
@@ -283,4 +289,3 @@ Pueden realizarlo **Enfermería** y **Administrador**. Cada alergia se almacena 
 | [CU3.1](#cu31-ver-alergias-cu3a) | Ver alergias | Administrar alergias | Enfermería, Administrador |
 | [CU3.2](#cu32-nueva-alergia-cu3b) | Nueva alergia | Administrar alergias | Enfermería, Administrador |
 | [CU3.3](#cu33-editar-alergia-cu3c) | Editar alergia | Administrar alergias | Enfermería, Administrador |
-| [CU4](#cu4-todos-los-cu-de-un-usuario) | Todos los CU de un usuario | Transversal | Administrador |

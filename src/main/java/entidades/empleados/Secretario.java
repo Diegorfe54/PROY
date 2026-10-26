@@ -36,5 +36,10 @@ public class Secretario extends Empleado {
 				+ ", getDireccion()=" + getDireccion() + ", toString()=" + super.toString() + ", getClass()="
 				+ getClass() + ", hashCode()=" + hashCode() + "]";
 	}
-	
+
+	@Override
+	public void mostrar() {
+		super.mostrar();
+		System.out.println("Años de experiencia: " + aniosExperiencia);
+	}
 }
