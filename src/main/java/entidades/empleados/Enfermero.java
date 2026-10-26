@@ -1,6 +1,8 @@
 package entidades.empleados;
 
-public class Enfermero {
+import entidades.Empleado;
+
+public class Enfermero extends Empleado {
 	private CategoriaEnfermero categoria;
 	
 	public Enfermero() {
@@ -21,9 +23,8 @@ public class Enfermero {
 
 	@Override
 	public String toString() {
-		return "Enfermero [categoria=" + categoria + ", getCategoria()=" + getCategoria() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+		return "Enfermero [categoria=" + categoria + ", idEmpleado=" + idEmpleado + ", nombre=" + nombre
+				+ ", apellidos=" + apellidos + ", telefono=" + telefono + ", email=" + email + ", dnifNie=" + dnifNie
+				+ ", direccion=" + direccion + "]";
 	}
-	
-	
 }
