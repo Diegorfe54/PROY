@@ -179,51 +179,51 @@ public class GestorAlergias {
 		alergia.mostrar();
 		System.out.println("");
 		Medicamento med = alergia.getMedicamento();
-    	boolean modificado = false;
-    	while(!modificado) {
-        	System.out.println("Que desea editar: ");
-        	System.out.println("1.- Nombre de la alergia.");
-        	System.out.println("2.- Nombre del medicamento.");
-        	System.out.println("3.- Principio activo del medicamento.");
-        	System.out.println("4.- Dosis máxima diaria del medicamento.");
-        	System.out.println("5.- Todos los datos.");
-        	System.out.println("0.- CANCELAR");
-    		switch(Utilidades.leerInt(Main.SC)) {
-    		case 1:
-    			alergia.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre de la alergia: ",Main.SC));
-    			modificado = true;
-    			break;
-    		case 2:
-    			med.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre del medicamento: ",Main.SC));
-    			modificado = true;
-    			break;
-    		case 3:
-    			med.setPrincipioActivo(Utilidades.pedirTexto("Introduzca el nuevo principio activo del medicamento: ",Main.SC));
-    			modificado = true;
-    			break;
-    		case 4:
-    			med.setDosisMaxDiariaMg(Utilidades.pedirIntPositivo("Introduzca la nueva dosis máxima diaria (mg): ",Main.SC));
-    			modificado = true;
-    			break;
-    		case 5:
-    			alergia.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre de la alergia: ",Main.SC));
-    			med.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre del medicamento: ",Main.SC));
-    			med.setPrincipioActivo(Utilidades.pedirTexto("Introduzca el nuevo principio activo del medicamento: ",Main.SC));
-    			med.setDosisMaxDiariaMg(Utilidades.pedirIntPositivo("Introduzca la nueva dosis máxima diaria (mg): ",Main.SC));
-    			modificado = true;
-    			break;
-    		case 0:
-    			System.out.println("Operación cancelada. No se ha modificado nada.");
-    			return false;
-    		default:
-    			System.out.println("Introduzca un valor listado en el menú.");
-    			break;
-    		}
-    	}
-    	if (!modificado) {
-    		System.out.println("No se ha realizado ningún cambio.");
-    		return false;
-    	}
+		int opcion;
+		do {
+			System.out.println("Que desea editar: ");
+			System.out.println("1.- Nombre de la alergia.");
+			System.out.println("2.- Nombre del medicamento.");
+			System.out.println("3.- Principio activo del medicamento.");
+			System.out.println("4.- Dosis máxima diaria del medicamento.");
+			System.out.println("5.- Todos los datos.");
+			System.out.println("0.- CANCELAR");
+
+			opcion = Utilidades.leerInt(Main.SC);
+
+			switch (opcion) {
+			case 1:
+				alergia.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre de la alergia: ", Main.SC));
+				break;
+
+			case 2:
+				med.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre del medicamento: ", Main.SC));
+				break;
+
+			case 3:
+				med.setPrincipioActivo(Utilidades.pedirTexto("Introduzca el nuevo principio activo del medicamento: ", Main.SC));
+				break;
+
+			case 4:
+				med.setDosisMaxDiariaMg(Utilidades.pedirIntPositivo("Introduzca la nueva dosis máxima diaria (mg): ", Main.SC));
+				break;
+
+			case 5:
+				alergia.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre de la alergia: ", Main.SC));
+				med.setNombre(Utilidades.pedirTexto("Introduzca el nuevo nombre del medicamento: ", Main.SC));
+				med.setPrincipioActivo(Utilidades.pedirTexto("Introduzca el nuevo principio activo del medicamento: ", Main.SC));
+				med.setDosisMaxDiariaMg(Utilidades.pedirIntPositivo("Introduzca la nueva dosis máxima diaria (mg): ", Main.SC));
+				break;
+
+			case 0:
+				System.out.println("Operación cancelada. No se ha modificado nada.");
+				return false;
+
+			default:
+				System.out.println("Opción no válida.");
+				break;
+			}
+		} while (opcion < 1 || opcion > 5);
     	System.out.println("=== ALERGIA MODIFICADA ===");
     	System.out.println("");
     	alergia.mostrar();

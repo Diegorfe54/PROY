@@ -338,42 +338,46 @@ public class GestorEmpleados {
 	 *         {@code false} si el usuario cancela.
 	 */
 	private static boolean elegirModificar(String[] datos) {
-		System.out.println("Introduzca lo que quiere modificar: ");
-		boolean modificado = false;
-		while (!modificado) {
+		int opcion;
+		do {
+			System.out.println("Introduzca lo que quiere modificar: ");
 			menuModificar();
-			switch (Utilidades.leerInt(Main.SC)) {
+			opcion = Utilidades.leerInt(Main.SC);
+
+			switch (opcion) {
 			case 1:
 				datos[0] = Utilidades.pedirTexto("Introduce el nuevo nombre de usuario: ", Main.SC);
-				modificado = true;
-				break;
+				return true;
+
 			case 2:
 				datos[1] = Utilidades.pedirTexto("Introduce la nueva contraseña: ", Main.SC);
-				modificado = true;
-				break;
+				return true;
+
 			case 3:
 				datos[2] = Utilidades.pedirTexto("Introduce el nuevo nombre completo del empleado: ", Main.SC);
-				modificado = true;
-				break;
+				return true;
+
 			case 4:
-				modificado = elegirTipoEmpleadoTexto(datos);
-				break;
+				return elegirTipoEmpleadoTexto(datos);
+
 			case 5:
 				datos[0] = Utilidades.pedirTexto("Introduce el nuevo nombre de usuario: ", Main.SC);
 				datos[1] = Utilidades.pedirTexto("Introduce la nueva contraseña: ", Main.SC);
 				datos[2] = Utilidades.pedirTexto("Introduce el nuevo nombre completo del empleado: ", Main.SC);
 				elegirTipoEmpleadoTexto(datos);
-				modificado = true;
-				break;
+				return true;
+
 			case 0:
 				System.out.println("Operación cancelada. No se ha modificado nada.");
 				return false;
+
 			default:
-				System.err.println("ERROR: Introduzca un valor listado en el menú.");
+				System.out.println("Opción no válida.");
 				break;
 			}
-		}
-		return true;
+		} while (opcion != 0);
+
+		return false;
 	}
 
 	/**
@@ -383,29 +387,31 @@ public class GestorEmpleados {
 	 * @return {@code true} cuando se elige un perfil válido.
 	 */
 	private static boolean elegirTipoEmpleadoTexto(String[] datos) {
-		System.out.println("Introduce el nuevo tipo de empleado: ");
-		boolean elegido = false;
-		while (!elegido) {
+		int opcion;
+		do {
+			System.out.println("Introduce el nuevo tipo de empleado: ");
 			menuTipoEmpleado();
-			int opc = Utilidades.leerInt(Main.SC);
-			switch (opc) {
+			opcion = Utilidades.leerInt(Main.SC);
+
+			switch (opcion) {
 			case 1:
 				datos[3] = Perfiles.SECRETARIA.getNombre();
-				elegido = true;
-				break;
+				return true;
+
 			case 2:
 				datos[3] = Perfiles.ENFERMERIA.getNombre();
-				elegido = true;
-				break;
+				return true;
+
 			case 3:
 				datos[3] = Perfiles.CIRUJANO.getNombre();
-				elegido = true;
-				break;
+				return true;
+
 			default:
-				System.err.println("ERROR: Introduce un valor numérico válido.");
+				System.out.println("Opción no válida.");
 				break;
 			}
-		}
+		} while (opcion < 1 || opcion > 3);
+
 		return true;
 	}
 
@@ -484,46 +490,47 @@ public class GestorEmpleados {
 	 */
 	private static Empleado elegirTipoEmpleado(Long id, String nombre, String apellidos,
 			String telefono, String email, String dni, String direccion) {
-		System.out.println("Elija el tipo de empleado: ");
-		boolean elegido = false;
+		int opcion;
 		Empleado empl = null;
-		while (!elegido) {
+		do {
+			System.out.println("Elija el tipo de empleado: ");
 			menuTipoEmpleado();
-			int opc = Utilidades.leerInt(Main.SC);
-			switch (opc) {
+			opcion = Utilidades.leerInt(Main.SC);
+
+			switch (opcion) {
 			case 1:
 				System.out.println("Introduzca años de experiencia: ");
 				int anios = Utilidades.leerInt(Main.SC);
 				empl = new Secretario(anios);
 				System.out.println("Has elegido secretariado.");
-				elegido = true;
 				break;
+
 			case 2:
 				CategoriaEnfermero catEnf = elegirCategoriaEnfermero();
 				empl = new Enfermero(catEnf);
 				System.out.println("Has elegido enfermería.");
-				elegido = true;
 				break;
+
 			case 3:
 				Set<Especialidades> especialidades = pedirEspecialidadesCirujano();
 				empl = new Cirujano(especialidades);
 				System.out.println("Has elegido cirujano.");
-				elegido = true;
 				break;
+
 			default:
-				System.err.println("ERROR: Introduce un valor numérico válido.");
+				System.out.println("Opción no válida.");
 				break;
 			}
-		}
-		if (empl != null) {
-			empl.setIdEmpleado(id);
-			empl.setNombre(nombre);
-			empl.setApellidos(apellidos);
-			empl.setTelefono(telefono);
-			empl.setEmail(email);
-			empl.setDnifNie(dni);
-			empl.setDireccion(direccion);
-		}
+		} while (opcion < 1 || opcion > 3);
+
+		empl.setIdEmpleado(id);
+		empl.setNombre(nombre);
+		empl.setApellidos(apellidos);
+		empl.setTelefono(telefono);
+		empl.setEmail(email);
+		empl.setDnifNie(dni);
+		empl.setDireccion(direccion);
+
 		return empl;
 	}
 
@@ -547,15 +554,18 @@ public class GestorEmpleados {
 	private static Set<Especialidades> pedirEspecialidadesCirujano() {
 		Set<Especialidades> especialidades = new HashSet<>();
 		System.out.println("Seleccione las especialidades del cirujano:");
-		boolean terminado = false;
-		while (!terminado) {
+		int opcion;
+		do {
 			menuEspecialidades();
 			System.out.println("Introduzca el número de la especialidad (0 para finalizar): ");
-			int opc = Utilidades.leerInt(Main.SC);
-			if (opc == 0) {
-				terminado = true;
-			} else {
-				Especialidades seleccionada = resolverEspecialidadPorId(opc);
+			opcion = Utilidades.leerInt(Main.SC);
+
+			switch (opcion) {
+			case 0:
+				break;
+
+			default:
+				Especialidades seleccionada = resolverEspecialidadPorId(opcion);
 				if (seleccionada != null) {
 					if (especialidades.add(seleccionada)) {
 						System.out.println("Añadida: " + seleccionada.getNombre());
@@ -563,10 +573,12 @@ public class GestorEmpleados {
 						System.out.println("La especialidad ya estaba añadida.");
 					}
 				} else {
-					System.err.println("ERROR: Seleccione una opción válida.");
+					System.out.println("Opción no válida.");
 				}
+				break;
 			}
-		}
+		} while (opcion != 0);
+
 		return especialidades;
 	}
 
@@ -591,25 +603,28 @@ public class GestorEmpleados {
 	 * @return {@link CategoriaEnfermero} seleccionada.
 	 */
 	private static CategoriaEnfermero elegirCategoriaEnfermero() {
-		System.out.println("Elige la categoría del enfermero: ");
-		CategoriaEnfermero catEnf = null;
-		while (catEnf == null) {
+		int opcion;
+		do {
+			System.out.println("Elige la categoría del enfermero: ");
 			menuCategoriaEnfermeria();
-			switch (Utilidades.leerInt(Main.SC)) {
+			opcion = Utilidades.leerInt(Main.SC);
+
+			switch (opcion) {
 			case 1:
-				catEnf = CategoriaEnfermero.A;
-				break;
+				return CategoriaEnfermero.A;
+
 			case 2:
-				catEnf = CategoriaEnfermero.B;
-				break;
+				return CategoriaEnfermero.B;
+
 			case 3:
-				catEnf = CategoriaEnfermero.C;
-				break;
+				return CategoriaEnfermero.C;
+
 			default:
-				System.err.println("ERROR: Introduce un valor numérico válido.");
+				System.out.println("Opción no válida.");
 				break;
 			}
-		}
-		return catEnf;
+		} while (opcion < 1 || opcion > 3);
+
+		return null;
 	}
 }

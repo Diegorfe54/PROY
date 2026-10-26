@@ -76,12 +76,15 @@ public class Main {
 		case SECRETARIA:
 			secretariado();
 			break;
+
 		case ENFERMERIA:
 			enfermeria();
 			break;
+
 		case ADMINISTRADOR:
 			administrador();
 			break;
+
 		case CIRUJANO:
 		default:
 			invitado();
@@ -103,10 +106,13 @@ public class Main {
 		switch (perfil) {
 		case SECRETARIA:
 			return accionesSecretariado(opcion);
+
 		case ENFERMERIA:
 			return accionesEnfermeria(opcion);
+
 		case ADMINISTRADOR:
 			return accionesAdministrador(opcion);
+
 		case CIRUJANO:
 		default:
 			return false;
@@ -117,19 +123,22 @@ public class Main {
 	 * Maneja las acciones de las que dispone un empleado del secretariado.
 	 * 
 	 * @param opcion int introducido por el usuario.
-	 * @return boolean validar si salir o no.
+	 * @return boolean validar si la opción fue ejecutada o es inválida.
 	 */
 	private static boolean accionesSecretariado(int opcion) {
 		switch (opcion) {
 		case 2:
 			GestorEmpleados.eliminarEmpleado();
 			return true;
+
 		case 3:
 			GestorEmpleados.anadirEmpleado();
 			return true;
+
 		case 4:
 			GestorEmpleados.modificarEmpleado();
 			return true;
+
 		default:
 			return false;
 		}
@@ -139,25 +148,29 @@ public class Main {
 	 * Maneja las acciones de las que dispone un empleado de enfermeria.
 	 * 
 	 * @param opcion int introducido por el usuario.
-	 * @return boolean validar si salir o no.
+	 * @return boolean validar si la opción fue ejecutada o es inválida.
 	 */
 	private static boolean accionesEnfermeria(int opcion) {
 		switch (opcion) {
 		case 2:
 			GestorAlergias.anadirAlergia();
 			return true;
+
 		case 3:
 			GestorAlergias.editarAlergia();
 			return true;
+
 		case 4:
 			GestorAlergias.verAlergia();
 			return true;
+
 		case 5:
 			System.out.println("== LISTADO DE ALERGIAS REGISTRADAS ==");
 			System.out.println("");
 			GestorAlergias.verAlergiasDisponibles();
 			System.out.println("");
 			return true;
+
 		default:
 			return false;
 		}
@@ -167,7 +180,7 @@ public class Main {
 	 * Maneja las acciones de las que dispone un administrador.
 	 * 
 	 * @param opcion int introducido por el usuario.
-	 * @return boolean validar si salir o no.
+	 * @return boolean validar si la opción fue ejecutada o es inválida.
 	 */
 	private static boolean accionesAdministrador(int opcion) {
 		if (opcion >= 5 && opcion <= 8) {
@@ -177,30 +190,71 @@ public class Main {
 	}
 
 	/**
-	 * Un ciclo del menú de invitado.
+	 * Menú de un usuario invitado hasta iniciar sesión o salir del programa.
 	 * 
-	 * @return {@code true} si el usuario quiere salir del programa.
-	 * @throws IOException si no se puede leer el archivo de credenciales.
+	 * @return {@code true} si el usuario desea salir del programa.
 	 */
-	private static boolean turnoInvitado() {
-		invitado();
-		switch (Utilidades.leerInt(SC)) {
-		case 1:
-			iniciarSesion();
-			return false;
-		case 0:
-			System.out.println("Has salido correctamente del menú de inicio de sesión.");
-			return true;
-		default:
-			System.err.println("ERROR: Has introducido incorrectamente los datos. Seleccione una opción del menú.");
-			return false;
-		}
+	private static boolean menuInvitado() {
+		int opcion;
+		do {
+			invitado();
+			opcion = Utilidades.leerInt(SC);
+
+			switch (opcion) {
+			case 1:
+				iniciarSesion();
+				if (sesion != null) {
+					return false;
+				}
+				break;
+
+			case 0:
+				System.out.println("Has salido correctamente del menú de inicio de sesión.");
+				return true;
+
+			default:
+				System.err.println("ERROR: Has introducido incorrectamente los datos. Seleccione una opción del menú.");
+				break;
+			}
+		} while (opcion != 0);
+
+		return true;
+	}
+
+	/**
+	 * Menú del usuario autenticado hasta cerrar sesión o salir del programa.
+	 * 
+	 * @return {@code true} si el usuario desea salir del programa.
+	 */
+	private static boolean menuAutenticado() {
+		int opcion;
+		do {
+			Perfiles perfil = sesion.getPerfil();
+			mostrar(perfil);
+			opcion = Utilidades.leerInt(SC);
+
+			switch (opcion) {
+			case 1:
+				cerrarSesion();
+				return false;
+
+			case 0:
+				System.out.println("Has salido correctamente del menú de trabajo.");
+				return true;
+
+			default:
+				if (!ejecutarAccion(perfil, opcion)) {
+					System.err.println("ERROR: Has introducido incorrectamente los datos. Seleccione una opción del menú.");
+				}
+				break;
+			}
+		} while (opcion != 0);
+
+		return true;
 	}
 
 	/**
 	 * Se encarga de llamar al método {@link Sesion#login()} para iniciar sesión.
-	 * 
-	 * @throws IOException no se ha podido leer el fichero de validación.
 	 */
 	private static void iniciarSesion() {
 		sesion = Sesion.login();
@@ -208,27 +262,6 @@ public class Main {
 			System.out.println(
 					"Bienvenido/a " + sesion.getPerfil().getNombre() + " " + sesion.getNombre() + ", tenga un buen día.");
 		}
-	}
-
-	/**
-	 * Un ciclo del menú del usuario autenticado.
-	 * 
-	 * @return {@code true} si el usuario quiere salir del programa.
-	 */
-	private static boolean turnoAutenticado() {
-		Perfiles perfil = sesion.getPerfil();
-		mostrar(perfil);
-		int opcion = Utilidades.leerInt(SC);
-		if (opcion == 0) {
-			System.out.println("Has salido correctamente del menú de trabajo.");
-			return true;
-		}
-		if (opcion == 1) {
-			cerrarSesion();
-		} else if (!ejecutarAccion(perfil, opcion)) {
-			System.err.println("ERROR: Has introducido incorrectamente los datos. Seleccione una opción del menú.");
-		}
-		return false;
 	}
 
 	/**
@@ -244,19 +277,21 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		System.out.println("INI");
 
 		try {
 			boolean salir = false;
-			while (!salir) {
-				salir = (sesion == null) ? turnoInvitado() : turnoAutenticado();
-			}
+			do {
+				if (sesion == null) {
+					salir = menuInvitado();
+				} else {
+					salir = menuAutenticado();
+				}
+			} while (!salir);
 		} catch (IllegalStateException e) {
 			System.err.println("ERROR: " + e.getMessage());
 		}
 
 		System.out.println("FIN");
 	}
-
 }

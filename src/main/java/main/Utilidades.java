@@ -141,9 +141,11 @@ public final class Utilidades {
 	 * @throws IllegalStateException si se cierra la entrada estándar.
 	 */
 	public static String pedirTexto(String mensaje, Scanner sc, int maxLongitud) {
-		while (true) {
+		String texto = null;
+		boolean valido = false;
+		do {
 			System.out.println(mensaje);
-			String texto = leerLinea(sc);
+			texto = leerLinea(sc);
 			if (texto == null) {
 				throw new IllegalStateException("Entrada estándar cerrada.");
 			}
@@ -152,9 +154,10 @@ public final class Utilidades {
 			} else if (texto.length() > maxLongitud) {
 				System.err.println("ERROR: máximo " + maxLongitud + " caracteres.");
 			} else {
-				return texto;
+				valido = true;
 			}
-		}
+		} while (!valido);
+		return texto;
 	}
  
 	/**
@@ -169,21 +172,22 @@ public final class Utilidades {
 	 * @throws IllegalStateException si se cierra la entrada estándar.
 	 */
 	public static int pedirInt(String mensaje, Scanner sc, int min, int max) {
-		while (true) {
+		Integer num = null;
+		do {
 			System.out.println(mensaje);
 			String linea = leerLinea(sc);
 			if (linea == null) {
 				throw new IllegalStateException("Entrada estándar cerrada.");
 			}
-			Integer num = parsearInt(linea);
+			num = parsearInt(linea);
 			if (num == null) {
 				System.err.println("ERROR: introduzca un número entero.");
 			} else if (num < min || num > max) {
 				System.err.println("ERROR: el valor debe estar entre " + min + " y " + max + ".");
-			} else {
-				return num;
+				num = null;
 			}
-		}
+		} while (num == null);
+		return num;
 	}
  
 	/**
