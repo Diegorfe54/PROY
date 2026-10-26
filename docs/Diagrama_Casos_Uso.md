@@ -61,7 +61,7 @@ usecase-beta
        EditAl("CU3.3 Editar alergia")
     end
 
-    Todos("CU4 Todos los CU de un usuario")
+    NotaAdministrador[Administrador engloba todos los CU de todos los usuarios] <<Nota>>
     
     Secretariado h1@--|> Usuario
     Enfermeria h2@--|> Usuario
@@ -83,7 +83,7 @@ usecase-beta
     %%Administrador --> NuevaAl
     %%Administrador --> EditAl
 
-    Administrador d1@--> Todos
+    Administrador d1@--> NotaAdministrador
 
     classDef usuario fill:#dbeafe,stroke:#2563eb,stroke-width:3px,color:#111
     classDef secretariado fill:#fde68a,stroke:#d97706,stroke-width:3px,color:#111
